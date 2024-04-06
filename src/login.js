@@ -3,13 +3,15 @@ import './App.css';
 
 const login = async (address, password) => {
     let response;
+    let data
     if (!address || !password) {
         response = await fetch('http://localhost:5000/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-        });
+        })
+        data = await response.json()
     } else {
         response = await fetch('http://localhost:5000/login', {
             method: 'POST',
@@ -18,8 +20,14 @@ const login = async (address, password) => {
             },
             body: JSON.stringify({ address, password }),
         });
+        data = await response.json()
     }
-    console.log(await response.json());
+    console.log(data)
+    if (data?.error !== undefined) {
+        console.error(data.error)
+        return false
+    }
+    return true
 };
 
 function LoginPage() {
@@ -54,7 +62,10 @@ function LoginPage() {
         event.preventDefault();
         const address = document.getElementById('address').value;
         const password = document.getElementById('password').value;
-        await login(address, password);
+        const success = await login(address, password);
+        if (success) {
+            window.location.href = '/home';
+        }
         // Navigate to register page
     };
 
@@ -74,7 +85,7 @@ function LoginPage() {
                     {message && <div id="accountno" className={message.type} style={{ color: "red" }}>{message.text}</div>}
                 </div>
                 <div style={{ marginTop: "50px" }}>
-                    <button name="regis" onClick={handleRegisterClick}>註冊</button>
+                    <a href="register">Register</a>
                     <button name="login" onClick={LoginClick}>Login</button>
                 </div>
             </div>
